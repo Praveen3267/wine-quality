@@ -1,34 +1,30 @@
+import pickle
 import streamlit as st
 import numpy as np
-import pickle
 
-# Load trained model and scaler
+# Load model and scaler
 model = pickle.load(open("rf_model.pkl", "rb"))
 scaler = pickle.load(open("scaler.pkl", "rb"))
 
-# Set up Streamlit app
-st.title("USO Price Prediction App")
-st.write("Enter the values below to predict the USO Closing Price")
+st.title("Wine Quality Prediction")
 
-# Input fields for the user — adjust these to match your top features
-open_val = st.number_input("Open", value=79.12)
-high_val = st.number_input("High", value=79.48)
-low_val = st.number_input("Low", value=78.93)
-volume_val = st.number_input("Volume", value=15960100)
-year = st.number_input("Year", value=2015)
-month = st.number_input("Month", value=1)
+# Input fields
+fixed_acidity = st.number_input("Fixed Acidity")
+volatile_acidity = st.number_input("Volatile Acidity")
+citric_acid = st.number_input("Citric Acid")
+residual_sugar = st.number_input("Residual Sugar")
+chlorides = st.number_input("Chlorides")
+free_sulfur_dioxide = st.number_input("Free Sulfur Dioxide")
+total_sulfur_dioxide = st.number_input("Total Sulfur Dioxide")
+density = st.number_input("Density")
+pH = st.number_input("pH")
+sulphates = st.number_input("Sulphates")
+alcohol = st.number_input("Alcohol")
 
-# Add more features if your model needs them
-# Example:
-# gdx_open = st.number_input("GDX_Open", value=21.5)
-
-# Collect input
-input_data = np.array([[open_val, high_val, low_val, volume_val, year, month]])
-
-# Scale input
-input_scaled = scaler.transform(input_data)
-
-# Predict button
-if st.button("Predict"):
-    prediction = model.predict(input_scaled)
-    st.success(f"Predicted USO Close Price: {prediction[0]:.2f}")
+if st.button("Predict Quality"):
+    input_data = np.array([[fixed_acidity, volatile_acidity, citric_acid, residual_sugar,
+                            chlorides, free_sulfur_dioxide, total_sulfur_dioxide, density,
+                            pH, sulphates, alcohol]])
+    scaled_data = scaler.transform(input_data)
+    prediction = model.predict(scaled_data)
+    st.success(f"Predicted Wine Quality: {prediction[0]}")
