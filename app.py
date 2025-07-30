@@ -1,38 +1,34 @@
 import streamlit as st
-import pickle
 import numpy as np
-import pandas as pd
+import pickle
 
-# Load model and scaler
+# Load trained model and scaler
 model = pickle.load(open("rf_model.pkl", "rb"))
 scaler = pickle.load(open("scaler.pkl", "rb"))
 
-# Feature names in correct order
-feature_names = ['fixed acidity', 'volatile acidity', 'citric acid', 'residual sugar',
-                 'chlorides', 'free sulfur dioxide', 'total sulfur dioxide', 'density',
-                 'pH', 'sulphates', 'alcohol']
+# Set up Streamlit app
+st.title("USO Price Prediction App")
+st.write("Enter the values below to predict the USO Closing Price")
 
-st.title("🍷 Wine Quality Prediction App")
+# Input fields for the user — adjust these to match your top features
+open_val = st.number_input("Open", value=79.12)
+high_val = st.number_input("High", value=79.48)
+low_val = st.number_input("Low", value=78.93)
+volume_val = st.number_input("Volume", value=15960100)
+year = st.number_input("Year", value=2015)
+month = st.number_input("Month", value=1)
 
-st.markdown("Enter the wine's physicochemical properties:")
+# Add more features if your model needs them
+# Example:
+# gdx_open = st.number_input("GDX_Open", value=21.5)
 
-# Create input fields
-input_data = []
-for feature in feature_names:
-    val = st.number_input(f"{feature}", format="%.4f")
-    input_data.append(val)
+# Collect input
+input_data = np.array([[open_val, high_val, low_val, volume_val, year, month]])
 
-if st.button("Predict Quality"):
-    try:
-        # Create DataFrame
-        input_df = pd.DataFrame([input_data], columns=feature_names)
+# Scale input
+input_scaled = scaler.transform(input_data)
 
-        # Scale input
-        input_scaled = scaler.transform(input_df)
-
-        # Predict
-        prediction = model.predict(input_scaled)
-
-        st.success(f"Predicted Wine Quality: **{prediction[0]}**")
-    except Exception as e:
-        st.error(f"Error: {str(e)}")
+# Predict button
+if st.button("Predict"):
+    prediction = model.predict(input_scaled)
+    st.success(f"Predicted USO Close Price: {prediction[0]:.2f}")
